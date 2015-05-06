@@ -1,0 +1,44 @@
+\date{\today}
+\title{Joint Beamforming}
+\author{Manu Thottathil Sreedharan}
+\newcommand{\room}{ID2/348}
+\newcommand{\tele}{23682}
+\newcommand{\mail}{Manu.ThottathilSreedharan@rub.de}
+
+\documentclass[]{dks-report}
+\usepackage[hidelinks]{hyperref}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{lipsum}
+\begin{document}
+
+\begin{center}
+  \huge{\textbf{Joint Multi-User Beamforming}}
+\end{center}
+
+\section{Brief Description}
+The project proposes to implement the idea described in \cite{Rahul2012_JMB}.
+The paper describes signal processing techniques to achieve phase
+synchronization required to implement a zero-forcing beamformer.
+The goal of beamforming is to ensure that each client can decode its intended
+signal without interference. In order to achieve phase synchornization in a
+distributed fasion, elect
+one AP as the master and other(hereafter called slave) APs have to maintain 
+required phase offset with respect to the lead AP.
+
+\section{Details}
+
+\section{Hardware Details}
+\begin{itemize}
+  \item TX = X300 + 2 CBX(1200 - 6000MHz)
+  \item RX = X300 + 2 WBX(50 - 2200 MHz)
+  \item Operating Frequency = 1850MHz
+\end{itemize}
+
+\section{Requirements}
+
+\bibliographystyle{ieeetr}
+\bibliography{/home/sreedhm/Documents/references}
+
+\end{document}
