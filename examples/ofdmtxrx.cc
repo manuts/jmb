@@ -29,29 +29,10 @@
 #include <boost/thread/thread.hpp>
 #include <boost/program_options.hpp>
 
+#include "tx_thread.h"
+#include "rx_thread.h"
+
 namespace po = boost::program_options;
-
-typedef struct
-{
-  uhd::usrp::multi_usrp::sptr * tx;
-} tx_thread_data;
-
-void * tx_worker (void * _data)
-{
-  tx_thread_data * data = (tx_thread_data *)_data;
-  return NULL;
-}
-
-typedef struct
-{
-  uhd::usrp::multi_usrp::sptr * rx;
-} rx_thread_data;
-
-void * rx_worker (void * _data)
-{
-  rx_thread_data * data = (rx_thread_data *)_data;
-  return NULL;
-}
 
 int UHD_SAFE_MAIN(int argc, char **argv)
 {
@@ -115,7 +96,9 @@ int UHD_SAFE_MAIN(int argc, char **argv)
 
   //check sanity of options
   if (vm.count("verbose") && vm.count("quite")) {
-    std::cout << "Conflicting Options" << std::endl;
+    std::cout << "Conflicting Options Verbose and Quite"
+      << "Please use only one of those."
+      << std::endl;
     return 0;
   }
 }
