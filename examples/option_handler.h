@@ -14,22 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <iostream>
 
-#include <uhd/utils/thread_priority.hpp>
-#include <uhd/utils/safe_main.hpp>
-#include <liquid/liquid.h>
+#ifndef OPTION_HANDLER_H
+#define OPTION_HANDLER_H
 
-#include "tx_thread.h"
-#include "rx_thread.h"
-#include "option_handler.h"
-
-int UHD_SAFE_MAIN(int argc, char **argv)
+typedef struct
 {
-  uhd::set_thread_priority_safe();
+  double cent_freq;         // center frequency of transmission
+  double samp_rate;         // usrp samping rate
+  double txgain;            // tx frontend gain
+  double rxgain;            // rx frontend gain
+  unsigned int M;           // number of subcarriers
+  unsigned int cp_len;      // length of cyclic prefix
+  unsigned int taper_len;   // taper prefix length
+  bool verbose;
+} opt_data;
 
-  opt_data opts;
-  opt_handler((void *)&opts, argc, argv);
-
-  return 0;
-}
+void opt_handler(void * opts, int argc, char** argv);
+#endif

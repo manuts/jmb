@@ -21,6 +21,7 @@ app_src		:=										\
 sup_src			:=									\
 	examples/tx_thread.cc					\
 	examples/rx_thread.cc					\
+	examples/option_handler.cc		\
 
 app_obj			= $(patsubst %.cc, %.o, $(app_src))
 
