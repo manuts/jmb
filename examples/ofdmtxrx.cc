@@ -24,6 +24,8 @@
 #include "tx_thread.h"
 #include "rx_thread.h"
 #include "option_handler.h"
+void init_usrp(uhd::usrp::multi_usrp::sptr * tx,
+               uhd::usrp::multi_usrp::sptr * rx); 
 
 int UHD_SAFE_MAIN(int argc, char **argv)
 {
@@ -31,18 +33,9 @@ int UHD_SAFE_MAIN(int argc, char **argv)
 
   opt_data opts;
   opt_handler((void *)&opts, argc, argv);
-
-  uhd::device_addr_t tx_addr, rx_addr;
   uhd::usrp::multi_usrp::sptr tx;
   uhd::usrp::multi_usrp::sptr rx;
-  tx_addr["addr0"] = "134.147.118.216";
-  rx_addr["addr0"] = "134.147.118.217";
-  tx = uhd::usrp::multi_usrp::make(tx_addr);
-  rx = uhd::usrp::multi_usrp::make(rx_addr);
-  uhd::usrp::subdev_spec_t tx_subdev_spec("A:0 B:0");
-  uhd::usrp::subdev_spec_t rx_subdev_spec("A:0 B:0");
-  tx->set_tx_subdev_spec(tx_subdev_spec, uhd::usrp::multi_usrp::ALL_MBOARDS);
-  rx->set_rx_subdev_spec(rx_subdev_spec, uhd::usrp::multi_usrp::ALL_MBOARDS);
+  init_usrp(&tx, &rx);
 
   return 0;
 }
