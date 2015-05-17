@@ -8,7 +8,7 @@ MV				:= mv -f
 RM				:= rm -f
 
 # flags
-INCLUDE_CFLAGS	= -I./ -I/target/include
+INCLUDE_CFLAGS	= -I./ -I/target/include -I./include
 CFLAGS			= 	$(INCLUDE_CFLAGS) -g -O2 -Wall -fPIC
 LDFLAGS			= 	-L/target/lib
 LDFLAGS			+= 	-luhd -lliquid -lm -lc -lboost_system-mt -lboost_thread-mt -lliquidgr
@@ -24,15 +24,23 @@ sup_src			:=									\
 	examples/option_handler.cc		\
 	examples/init_usrp.cc					\
 
+inc_hdr			:=									\
+	include/ofdm_modem.h					\
+
+lib_src			:=									\
+	lib/ofdm_modem.cc							\
+
 app_obj			= $(patsubst %.cc, %.o, $(app_src))
 
 app_exe			= $(patsubst %.cc, %.exe, $(app_src))
 
 sup_obj			= $(patsubst %.cc, %.o, $(sup_src))
 
+lib_obj			= $(patsubst %.cc, %.o, $(lib_src))
+
 all					: $(app_exe)
 
-$(app_exe)	: %.exe : %.o $(sup_obj)
+$(app_exe)	: %.exe : %.o $(sup_obj) $(lib_obj)
 	$(env) $(CXX) $^ -o $@ $(LDFLAGS)
 
 $(app_obj)	: %.o :	%.cc
@@ -41,5 +49,8 @@ $(app_obj)	: %.o :	%.cc
 $(sup_obj)	: %.o :	%.cc
 	$(CXX) $(CFLAGS) -c $< -o $@
 
+$(lib_obj)	: %.o :	%.cc
+	$(CXX) $(CFLAGS) -c $< -o $@
+
 clean			:
-	$(RM) $(app_obj) $(sup_obj)
+	$(RM) $(app_obj) $(sup_obj) $(lib_obj)

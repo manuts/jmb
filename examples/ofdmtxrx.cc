@@ -24,8 +24,11 @@
 #include "tx_thread.h"
 #include "rx_thread.h"
 #include "option_handler.h"
+#include "ofdm_modem.h"
+
 void init_usrp(uhd::usrp::multi_usrp::sptr * tx,
-               uhd::usrp::multi_usrp::sptr * rx); 
+               uhd::usrp::multi_usrp::sptr * rx,
+               opt_data * opts); 
 
 int UHD_SAFE_MAIN(int argc, char **argv)
 {
@@ -33,9 +36,19 @@ int UHD_SAFE_MAIN(int argc, char **argv)
 
   opt_data opts;
   opt_handler((void *)&opts, argc, argv);
+
   uhd::usrp::multi_usrp::sptr tx;
   uhd::usrp::multi_usrp::sptr rx;
-  init_usrp(&tx, &rx);
+//  init_usrp(&tx, &rx, &opts);
+
+  unsigned char * p = NULL;     // for default carrier allocaiton
+  std::cout << opts.M << std::endl;
+  ofdm_mod mod(opts.M,
+               opts.cp_len,
+               opts.taper_len,
+               p);
+
+  std::cout << mod.get_M() << std::endl;
 
   return 0;
 }

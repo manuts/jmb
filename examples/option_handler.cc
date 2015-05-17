@@ -52,6 +52,15 @@ void opt_handler(void * _opts, int argc, char** argv)
     ("rx_gain",
      po::value<double>(&(opts->rxgain))->default_value(d_rxgain),
      "RX Front end gain")
+    ("num_subcarriers",
+     po::value<unsigned int>(&(opts->M))->default_value(d_M),
+     "Number of OFDM subcarriers")
+    ("cp_len",
+     po::value<unsigned int>(&(opts->cp_len))->default_value(d_cp_len),
+     "Cyclic Prefix Length")
+    ("taper_len",
+     po::value<unsigned int>(&(opts->taper_len))->default_value(d_taper_len),
+     "Taper Prefix Length")
     ("verbose,v",
      "Verbose")
     ("quite,q",

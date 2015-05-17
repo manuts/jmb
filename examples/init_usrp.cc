@@ -15,8 +15,12 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <uhd/usrp/multi_usrp.hpp>
+#include "option_handler.h"
+
 void init_usrp(uhd::usrp::multi_usrp::sptr * tx,
-               uhd::usrp::multi_usrp::sptr * rx) 
+               uhd::usrp::multi_usrp::sptr * rx,
+               opt_data * opts) 
 {
   size_t num_tx_chans, num_rx_chans;
   uhd::device_addr_t tx_addr, rx_addr;
@@ -33,21 +37,21 @@ void init_usrp(uhd::usrp::multi_usrp::sptr * tx,
 
   num_tx_chans = (*tx)->get_tx_num_channels();
   for (size_t chan = 0; chan < num_tx_chans; chan++) {
-    (*tx)->set_tx_rate(samp_rate, chan);
-    uhd::tune_request_t tx_tune_request(cent_freq);
+    (*tx)->set_tx_rate(opts->samp_rate, chan);
+    uhd::tune_request_t tx_tune_request(opts->cent_freq);
     uhd::tune_result_t tx_tune_result;
     tx_tune_result = (*tx)->set_tx_freq(tx_tune_request, chan);
-    (*tx)->set_tx_gain(txgain, chan);
+    (*tx)->set_tx_gain(opts->txgain, chan);
     (*tx)->set_tx_antenna("TX/RX", chan);
   }
 
   num_rx_chans = (*rx)->get_rx_num_channels();
   for (size_t chan = 0; chan < num_rx_chans; chan++) {
-    (*rx)->set_rx_rate(samp_rate, chan);
-    uhd::tune_request_t rx_tune_request(cent_freq);
+    (*rx)->set_rx_rate(opts->samp_rate, chan);
+    uhd::tune_request_t rx_tune_request(opts->cent_freq);
     uhd::tune_result_t rx_tune_result;
     rx_tune_result = (*rx)->set_rx_freq(rx_tune_request, chan);
-    (*rx)->set_rx_gain(rxgain, chan);
+    (*rx)->set_rx_gain(opts->rxgain, chan);
     (*rx)->set_rx_antenna("TX/RX", chan);
   }
 }
