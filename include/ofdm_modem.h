@@ -42,18 +42,22 @@ class ofdm_mod
 
     // transmitter methods
     void set_soft_gain(float gain_soft);
-    void reset_tx();
+    void reset();
     unsigned int get_tx_buff_len();
-    void set_payload_len(unsigned int _payload_len);
     void set_mod(int _mod);
     unsigned int get_M();
     unsigned int get_cp_len();
     unsigned int get_taper_len();
+    unsigned int get_payload_len();
+    void set_payload_len(unsigned int _payload_len);
+    void print_framegen_config();
+    unsigned int get_framelen();
     
 
     // assemble OFDM symbol
     void assemble_symbol(unsigned char * _header,
-                         unsigned char * _payload);
+                         unsigned char * _payload,
+                         std::complex<float> * tx_buff);
                          // frame generator properties...
 
   private:
@@ -84,22 +88,25 @@ class ofdm_dem
     ofdm_dem(unsigned int       _M,
              unsigned int       _cp_len,
              unsigned int       _taper_len,
-             unsigned int *     _p,
+             unsigned char *    _p,
              framesync_callback _callback,
              void *             _userdata);
 
     // destructor
     ~ofdm_dem();
 
-    // transmitter methods
-    void reset_rx();
+    // receiver methods
+    void reset();
+    unsigned int get_M();
 
   private:
+    ofdmflexframesync fs;           // frame synchronizer object
     unsigned int M;
     unsigned int cp_len;
     unsigned int taper_len;
-    unsigned int * p;
-    ofdmflexframesync fs;           // frame synchronizer object
+    unsigned char * p;
+    framesync_callback callback;
+    void * userdata;
 };
 
 #endif
