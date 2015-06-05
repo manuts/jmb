@@ -15,10 +15,7 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "option_handler.h"
-#include <boost/program_options.hpp>
-#include <boost/format.hpp>
-#include <iostream>
+#include "ofdmtxrx.h"
 
 namespace po = boost::program_options;
 

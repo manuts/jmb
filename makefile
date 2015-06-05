@@ -16,19 +16,14 @@ LDFLAGS			+= 	-lboost_program_options-mt -lpthread -lvolk
 env				 	= 	LD_LIBRARY_PATH="/target/lib/"
 
 app_src		:=										\
-	examples/ofdmtxrx.cc					\
+	ofdmtxrx.cc										\
 
 sup_src			:=									\
-	examples/tx_thread.cc					\
-	examples/rx_thread.cc					\
-	examples/option_handler.cc		\
-	examples/init_usrp.cc					\
-
-inc_hdr			:=									\
-	include/ofdm_modem.h					\
-
-lib_src			:=									\
-	lib/ofdm_modem.cc							\
+	tx_thread.cc									\
+	rx_thread.cc									\
+	option_handler.cc							\
+	init_usrp.cc									\
+	simulator.cc									\
 
 app_obj			= $(patsubst %.cc, %.o, $(app_src))
 
@@ -36,11 +31,9 @@ app_exe			= $(patsubst %.cc, %.exe, $(app_src))
 
 sup_obj			= $(patsubst %.cc, %.o, $(sup_src))
 
-lib_obj			= $(patsubst %.cc, %.o, $(lib_src))
-
 all					: $(app_exe)
 
-$(app_exe)	: %.exe : %.o $(sup_obj) $(lib_obj)
+$(app_exe)	: %.exe : %.o $(sup_obj) $(app_obj)
 	$(env) $(CXX) $^ -o $@ $(LDFLAGS)
 
 $(app_obj)	: %.o :	%.cc
@@ -49,8 +42,5 @@ $(app_obj)	: %.o :	%.cc
 $(sup_obj)	: %.o :	%.cc
 	$(CXX) $(CFLAGS) -c $< -o $@
 
-$(lib_obj)	: %.o :	%.cc
-	$(CXX) $(CFLAGS) -c $< -o $@
-
 clean			:
-	$(RM) $(app_obj) $(sup_obj) $(lib_obj)
+	$(RM) $(app_obj) $(sup_obj)

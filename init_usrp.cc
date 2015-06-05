@@ -15,8 +15,10 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <uhd/usrp/multi_usrp.hpp>
-#include "option_handler.h"
+#include "ofdmtxrx.h"
+
+#define TX_IS_N200 1
+#define TX_IS_X300 0
 
 void init_usrp(uhd::usrp::multi_usrp::sptr * tx,
                uhd::usrp::multi_usrp::sptr * rx,
@@ -24,14 +26,19 @@ void init_usrp(uhd::usrp::multi_usrp::sptr * tx,
 {
   size_t num_tx_chans, num_rx_chans;
   uhd::device_addr_t tx_addr, rx_addr;
-  tx_addr["addr0"] = "134.147.118.216";
+  tx_addr["addr0"] = "134.147.118.212";
   rx_addr["addr0"] = "134.147.118.217";
   *tx = uhd::usrp::multi_usrp::make(tx_addr);
   *rx = uhd::usrp::multi_usrp::make(rx_addr);
-  uhd::usrp::subdev_spec_t tx_subdev_spec("A:0 B:0");
+  uhd::usrp::subdev_spec_t tx_subdev_spec_N200("A:0");
+  uhd::usrp::subdev_spec_t tx_subdev_spec_X300("A:0 B:0");
   uhd::usrp::subdev_spec_t rx_subdev_spec("A:0 B:0");
-  (*tx)->set_tx_subdev_spec(tx_subdev_spec,
-                            uhd::usrp::multi_usrp::ALL_MBOARDS);
+  if(TX_IS_N200)
+    (*tx)->set_tx_subdev_spec(tx_subdev_spec_N200,
+                              uhd::usrp::multi_usrp::ALL_MBOARDS);
+  else if(TX_IS_X300)
+    (*tx)->set_tx_subdev_spec(tx_subdev_spec_X300,
+                              uhd::usrp::multi_usrp::ALL_MBOARDS);
   (*rx)->set_rx_subdev_spec(rx_subdev_spec,
                             uhd::usrp::multi_usrp::ALL_MBOARDS);
 
