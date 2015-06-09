@@ -33,12 +33,14 @@ void * tx_worker (void * _data)
   std::complex<float> ** modulator_buffer;
   // usrp buffer
   std::vector<std::complex<float> *> usrp_buffer;
+  // payload len
+  unsigned int payload_len;
+  // header len
+  unsigned int header_len;
   // payload data
-  unsigned char payload[OFDMFRAME_P_LEN];
+  unsigned char * payload;
   // header data
-  unsigned char header[OFDMFRAME_H_USR];
-  // packet id
-  unsigned int pid;
+  unsigned char * header;
   // number of channels available with USRP
   unsigned int num_channels;
   // channel vector
@@ -52,8 +54,14 @@ void * tx_worker (void * _data)
   cp_len = (data->mod)->get_cp_len();
   frame_len = (data->mod)->get_frame_len();
   modulator_buffer_len = (M + cp_len)*frame_len;
+  header_len = (data->mod)->get_h_usr_len();
+  payload_len = (data->mod)->get_payload_dec_len();
   num_channels = (*(data->tx))->get_tx_num_channels();
 
+  payload = (unsigned char *) malloc 
+    (payload_len*sizeof(unsigned char));
+  header = (unsigned char *) malloc 
+    (header_len*sizeof(unsigned char));
   modulator_buffer = (std::complex<float> **) 
     malloc(num_channels*sizeof(std::complex<float> *));
   for(size_t chan = 0; chan < num_channels; chan++) {
@@ -76,19 +84,19 @@ void * tx_worker (void * _data)
 
   uhd::time_spec_t event(0.1);
   txmd.time_spec = event;
-  time_t tx_begin = time(NULL);
+  *(data->tx_begin) = time(NULL);
 
   unsigned int i;
-  pid = 0;
-  while(time(NULL) - tx_begin < runtime)
+  *(data->pid) = 0;
+  while(time(NULL) - *(data->tx_begin) < data->runtime)
   {
-    printf("tx packet id: %6u\n", pid);
-    header[0] = (pid >> 8) & 0xff;
-    header[1] = (pid     ) & 0xff;
-    for(i = 2; i < OFDMFRAME_H_USR; i++)
+//    printf("tx packet id: %6u\n", *(data->pid));
+    header[0] = (*(data->pid) >> 8) & 0xff;
+    header[1] = (*(data->pid)     ) & 0xff;
+    for(i = 2; i < header_len; i++)
       header[i] = rand() & 0xff;
 
-    for(i = 0; i < OFDMFRAME_P_LEN; i++)
+    for(i = 0; i < payload_len; i++)
       payload[i] = rand() & 0xff;
 
     (data->mod)->assemble_frame(header, payload);
@@ -96,19 +104,13 @@ void * tx_worker (void * _data)
     num_samples_sent = tx_stream->send(usrp_buffer,
                                        modulator_buffer_len,
                                        txmd);
-    if(num_samples_sent != modulator_buffer_len)
-    {
-      std::cout << "Requested to transmission of "
-                << modulator_buffer_len
-                << " samples. Sent only "
-                << num_samples_sent
-                << " samples" << std::endl;
-    }
-    pid++;
+    txmd.start_of_burst = false;
+    txmd.has_time_spec = false;
+    (*(data->pid))++;
   }
 
   // transmission ends
-  time_t tx_end = time(NULL);
+  *(data->tx_end) = time(NULL);
   std::cout << "Exiting tx thread\n";
   // send the last packet
   txmd.end_of_burst = true;

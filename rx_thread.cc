@@ -34,10 +34,17 @@ void * rx_worker (void * _data)
   unsigned int num_samples_rcvd;
   // timeout
   float timeout = 0.2;
+  // file to save data;
+  FILE * f_rx_sig;
+  // total number of samples received
+  unsigned int num_accumulated_samples;
 
   rx_thread_data * data = (rx_thread_data *)_data;
 
   num_channels = (*(data->rx))->get_tx_num_channels();
+
+  if(!(data->online_decoding))
+    f_rx_sig = fopen("/tmp/rx_sig", "wb");
 
   for(size_t chan = 0; chan < num_channels; chan++)
     channels.push_back(chan);
@@ -62,34 +69,73 @@ void * rx_worker (void * _data)
   stream_cmd.stream_now = false;
   stream_cmd.time_spec = uhd::time_spec_t(0.1);
   rx_stream->issue_stream_cmd(stream_cmd);
-  time_t rx_begin = time(NULL);
+  *(data->streamer_error) = false;
+  *(data->rx_begin) = time(NULL);
+  num_accumulated_samples = 0;
 
-  while(time(NULL) - rx_begin < runtime)
+  while(time(NULL) - *(data->rx_begin) < data->runtime)
   {
     num_samples_rcvd = rx_stream->recv(usrp_buffer,
                                        usrp_buffer_len,
                                        rxmd,
                                        timeout);
     if(rxmd.error_code) {
-      std::cerr << rxmd.strerror() << "\n";
+      *(data->streamer_error) = true;
+      memmove(data->rxmd_to_main, &rxmd,
+              sizeof(uhd::rx_metadata_t));
       break;
     }
-    (data->dem)->demodulate_samples(demodulator_buffer[0],
-                                    num_samples_rcvd);
     timeout = 0.1;
+    num_accumulated_samples += num_samples_rcvd;
+    if(data->online_decoding) {
+      (data->dem)->demodulate_samples(demodulator_buffer[0],
+                                      num_samples_rcvd);
+    }
+    else {
+      assert(fwrite((void *)demodulator_buffer[0],
+                    sizeof(std::complex<float>),
+                    num_samples_rcvd,
+                    f_rx_sig) ==
+             num_samples_rcvd);
+    }
   }
 
-  time_t rx_end = time(NULL);
+  *(data->rx_end) = time(NULL);
   std::cout << "Exiting rx thread\n";
   // stop rx streaming
   stream_cmd.stream_mode = 
     uhd::stream_cmd_t::STREAM_MODE_STOP_CONTINUOUS;
   rx_stream->issue_stream_cmd(stream_cmd);
 
+  if(!(data->online_decoding)) {
+    fclose(f_rx_sig);
+    unsigned int samples_remaining = num_accumulated_samples;
+    unsigned int num_samples_to_process;
+    f_rx_sig = fopen("/tmp/rx_sig", "rb");
+    time_t decode_begin = time(NULL);
+    while(samples_remaining)
+    {
+      num_samples_to_process = 
+        (samples_remaining > usrp_buffer_len) ?
+        usrp_buffer_len :
+        samples_remaining;
+      assert(
+          fread((void *)demodulator_buffer[0],
+                sizeof(std::complex<float>),
+                num_samples_to_process,
+                f_rx_sig) == 
+                num_samples_to_process);
+      (data->dem)->demodulate_samples(demodulator_buffer[0],
+                                      num_samples_to_process);
+      samples_remaining -= num_samples_to_process;
+    }
+    *(data->time_for_offline_decoding) = 
+      time(NULL) - decode_begin;
+  }
+
   for(size_t chan = 0; chan < num_channels; chan++) {
     free(usrp_buffer[chan]);
   }
   free(demodulator_buffer);
-
   pthread_exit(NULL);
 }

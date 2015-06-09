@@ -28,9 +28,9 @@ void opt_handler(void * _opts, int argc, char** argv)
   double d_samp_rate      = 1000e3;
   double d_txgain         = 15.0;
   double d_rxgain         = 15.0;
-  unsigned int d_M          = 64;
-  unsigned int d_cp_len     = 6;
-  unsigned int d_taper_len  = 4;
+  unsigned int d_M            = 64;
+  unsigned int d_cp_len       = 6;
+  unsigned int d_taper_len    = 4;
 
   //set the operating parameters
   po::options_description desc("Allowed options");

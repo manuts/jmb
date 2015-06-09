@@ -27,8 +27,6 @@ void * simulator (void * _data)
       == (data->dem)->get_M());
   assert((data->mod)->get_frame_len() 
       == (data->dem)->get_frame_len());
-  assert((data->mod)->get_payload_dec_len() 
-      == (data->dem)->get_payload_dec_len());
   assert((data->mod)->get_payload_mod_len() 
       == (data->dem)->get_payload_mod_len());
   assert((data->mod)->get_payload_enc_len() 
@@ -41,14 +39,27 @@ void * simulator (void * _data)
   unsigned int cp_len;
   unsigned int sig_buff_len;
   std::complex<float> * sig_buff;
-  unsigned char payload[OFDMFRAME_P_LEN];
-  unsigned char header[OFDMFRAME_H_USR];
+  // payload len
+  unsigned int payload_len;
+  // header len
+  unsigned int header_len;
+  // payload data
+  unsigned char * payload;
+  // header data
+  unsigned char * header;
   unsigned int pid;
 
   frame_len = (data->mod)->get_frame_len();
   M = (data->mod)->get_M();
   cp_len = (data->mod)->get_cp_len();
   sig_buff_len = (M + cp_len)*frame_len;
+  header_len = (data->mod)->get_h_usr_len();
+  payload_len = (data->mod)->get_payload_dec_len();
+  payload = (unsigned char *) malloc 
+    (payload_len*sizeof(unsigned char));
+  header = (unsigned char *) malloc 
+    (header_len*sizeof(unsigned char));
+
   sig_buff = (std::complex<float> *) malloc 
                  (sizeof(std::complex<float>)*sig_buff_len);
 
@@ -58,10 +69,10 @@ void * simulator (void * _data)
     printf("tx packet id: %6u\n", pid);
     header[0] = (pid >> 8) & 0xff;
     header[1] = (pid     ) & 0xff;
-    for(i = 2; i < OFDMFRAME_H_USR; i++)
+    for(i = 2; i < header_len; i++)
       header[i] = rand() & 0xff;
 
-    for(i = 0; i < OFDMFRAME_P_LEN; i++)
+    for(i = 0; i < payload_len; i++)
       payload[i] = rand() & 0xff;
 
     (data->mod)->assemble_frame(header, payload);

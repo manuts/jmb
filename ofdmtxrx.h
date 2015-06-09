@@ -28,23 +28,22 @@
 #include <boost/format.hpp>
 #include <ctime>
 
-
-extern float runtime;
 extern std::string cpu;    // cpu format for the streamer
 extern std::string wire;   // wire formate for the streamer
-extern time_t tx_begin, tx_end;
-extern time_t rx_begin, rx_end;
 
 typedef struct
 {
   double cent_freq;         // center frequency of transmission
   double samp_rate;         // usrp samping rate
+  std::complex<float> dsp_gain;
   double txgain;            // tx frontend gain
   double rxgain;            // rx frontend gain
   unsigned int M;           // number of subcarriers
   unsigned int cp_len;      // length of cyclic prefix
   unsigned int taper_len;   // taper prefix length
   bool verbose;
+  unsigned int header_len;
+  unsigned int payload_len;
 } opt_data;
 
 typedef struct
@@ -58,13 +57,23 @@ typedef struct
 {
   uhd::usrp::multi_usrp::sptr * tx;
   liquid::ofdm::modulator * mod;
-  void * usr_data;
+  time_t * tx_begin;
+  time_t * tx_end;
+  unsigned int * pid;
+  float runtime;
 } tx_thread_data;
 
 typedef struct
 {
   uhd::usrp::multi_usrp::sptr * rx;
   liquid::ofdm::demodulator * dem;
+  time_t * rx_begin;
+  time_t * rx_end;
+  float runtime;
+  bool * streamer_error;
+  uhd::rx_metadata_t * rxmd_to_main;
+  bool online_decoding;
+  float * time_for_offline_decoding;
 } rx_thread_data;
 
 void opt_handler(void * _opts, int argc, char** argv);
