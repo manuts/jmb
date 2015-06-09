@@ -85,10 +85,10 @@ int UHD_SAFE_MAIN(int argc, char **argv)
   frame_struct->H_CRC =  LIQUID_CRC_32;
   frame_struct->H_MOD =  LIQUID_MODEM_QPSK;
   frame_struct->P_LEN =  2048;
-  frame_struct->P_EC1 =  LIQUID_FEC_CONV_V29;
+  frame_struct->P_EC1 =  LIQUID_FEC_NONE;
   frame_struct->P_EC2 =  LIQUID_FEC_NONE;
   frame_struct->P_CRC =  LIQUID_CRC_32;
-  frame_struct->P_MOD =  LIQUID_MODEM_ARB64OPT;
+  frame_struct->P_MOD =  LIQUID_MODEM_QPSK;
 
   liquid::ofdm::modulator mod(opts.M,
                               opts.cp_len,
