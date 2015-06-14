@@ -26,6 +26,9 @@ sup_obj			= $(patsubst %.cc, %.o, $(sup_src))
 
 all						: ofdmtxrx.exe
 
+mimo_siso_tx1	: $(sup_obj) mimo_siso_tx1.o
+	$(env) $(CXX) $^ -o $@ $(LDFLAGS)
+
 ofdmtxrx.exe	: $(sup_obj) ofdmtxrx.o
 	$(env) $(CXX) $^ -o $@ $(LDFLAGS)
 

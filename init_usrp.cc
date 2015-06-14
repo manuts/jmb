@@ -62,3 +62,44 @@ void init_usrp(uhd::usrp::multi_usrp::sptr * tx,
     (*rx)->set_rx_antenna("TX/RX", chan);
   }
 }
+
+void init_usrp(uhd::usrp::multi_usrp::sptr * u,
+               std::string addr,
+               opt_data * opts) 
+{
+  size_t num_tx_chans, num_rx_chans;
+  uhd::device_addr_t u_addr;;
+  u_addr["addr0"] = addr;
+  *u = uhd::usrp::multi_usrp::make(u_addr);
+  uhd::usrp::subdev_spec_t u_subdev_spec_N200("A:0");
+  uhd::usrp::subdev_spec_t u_subdev_spec_X300("A:0 B:0");
+  std::cout (*u)->get_mboard_name();
+//  if(TX_IS_N200)
+//    (*tx)->set_tx_subdev_spec(tx_subdev_spec_N200,
+//                              uhd::usrp::multi_usrp::ALL_MBOARDS);
+//  else if(TX_IS_X300)
+//    (*tx)->set_tx_subdev_spec(tx_subdev_spec_X300,
+//                              uhd::usrp::multi_usrp::ALL_MBOARDS);
+//  (*rx)->set_rx_subdev_spec(rx_subdev_spec,
+//                            uhd::usrp::multi_usrp::ALL_MBOARDS);
+//
+//  num_tx_chans = (*tx)->get_tx_num_channels();
+//  for (size_t chan = 0; chan < num_tx_chans; chan++) {
+//    (*tx)->set_tx_rate(opts->samp_rate, chan);
+//    uhd::tune_request_t tx_tune_request(opts->cent_freq);
+//    uhd::tune_result_t tx_tune_result;
+//    tx_tune_result = (*tx)->set_tx_freq(tx_tune_request, chan);
+//    (*tx)->set_tx_gain(opts->txgain, chan);
+//    (*tx)->set_tx_antenna("TX/RX", chan);
+//  }
+//
+//  num_rx_chans = (*rx)->get_rx_num_channels();
+//  for (size_t chan = 0; chan < num_rx_chans; chan++) {
+//    (*rx)->set_rx_rate(opts->samp_rate, chan);
+//    uhd::tune_request_t rx_tune_request(opts->cent_freq);
+//    uhd::tune_result_t rx_tune_result;
+//    rx_tune_result = (*rx)->set_rx_freq(rx_tune_request, chan);
+//    (*rx)->set_rx_gain(opts->rxgain, chan);
+//    (*rx)->set_rx_antenna("TX/RX", chan);
+//  }
+}
