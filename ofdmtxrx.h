@@ -35,7 +35,7 @@ typedef struct
 {
   double cent_freq;         // center frequency of transmission
   double samp_rate;         // usrp samping rate
-  std::complex<float> dsp_gain;
+  float dsp_gain;           // dsp gain
   double txgain;            // tx frontend gain
   double rxgain;            // rx frontend gain
   unsigned int M;           // number of subcarriers
@@ -82,8 +82,11 @@ void * rx_worker (void * _data);
 void * simulator (void * _data);
 void init_usrp(uhd::usrp::multi_usrp::sptr * tx,
                uhd::usrp::multi_usrp::sptr * rx,
+               std::string _tx_addr,
+               std::string _rx_addr,
                opt_data * opts);
 void init_usrp(uhd::usrp::multi_usrp::sptr * u,
                std::string addr,
-               opt_data * opts);
+               opt_data * opts,
+               bool is_tx);
 #endif

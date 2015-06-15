@@ -24,9 +24,6 @@ unsigned int num_valid_headers_received;
 unsigned int num_valid_bytes_received;
 unsigned int num_valid_packets_received;
 
-std::string cpu = "fc32";    // cpu format for the streamer
-std::string wire = "sc16";   // wire formate for the streamer
-
 int callback(unsigned char *  _header,
              int              _header_valid,
              unsigned char *  _payload,
@@ -116,7 +113,10 @@ int UHD_SAFE_MAIN(int argc, char **argv)
     simulator((void *)modem);
     free(modem);
   } else {
-    init_usrp(&tx, &rx, &opts);
+    init_usrp(&tx, &rx, 
+              "134.147.118.212",
+              "134.147.118.217",
+              &opts);
     tx_data = (tx_thread_data *) malloc (sizeof(tx_thread_data));
     rx_data = (rx_thread_data *) malloc (sizeof(rx_thread_data));
     tx_data->tx = &tx;

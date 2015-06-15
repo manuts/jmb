@@ -31,6 +31,7 @@ void opt_handler(void * _opts, int argc, char** argv)
   unsigned int d_M            = 64;
   unsigned int d_cp_len       = 6;
   unsigned int d_taper_len    = 4;
+  float d_dsp_gain            = 0.25;
 
   //set the operating parameters
   po::options_description desc("Allowed options");
@@ -43,6 +44,9 @@ void opt_handler(void * _opts, int argc, char** argv)
     ("rate,r",
      po::value<double>(&(opts->samp_rate))->default_value(d_samp_rate),
      "USRP Sampling rate")
+    ("dsp_gain",
+     po::value<float>(&(opts->dsp_gain))->default_value(d_dsp_gain),
+     "TX DSP gain")
     ("tx_gain",
      po::value<double>(&(opts->txgain))->default_value(d_txgain),
      "TX Front end gain")
@@ -85,4 +89,7 @@ void opt_handler(void * _opts, int argc, char** argv)
       << std::endl;
     exit(0);
   }
+
+  if (vm.count("verbose"))
+    opts->verbose = true;
 }

@@ -12,7 +12,7 @@ INCLUDE_CFLAGS	= -I./ -I/target/include -I./include
 CFLAGS			= 	$(INCLUDE_CFLAGS) -g -O2 -Wall -fPIC
 LDFLAGS			= 	-L/target/lib
 LDFLAGS			+= 	-luhd -lliquid -lm -lc -lboost_system-mt -lboost_thread-mt -lliquidgr
-LDFLAGS			+= 	-lboost_program_options-mt -lpthread -lvolk
+LDFLAGS			+= 	-lboost_program_options-mt -lpthread -lvolk -lfftw3f
 env				 	= 	LD_LIBRARY_PATH="/target/lib"
 
 sup_src			:=									\
@@ -22,21 +22,26 @@ sup_src			:=									\
 	init_usrp.cc									\
 	simulator.cc									\
 
-sup_obj			= $(patsubst %.cc, %.o, $(sup_src))
+sup_obj					= $(patsubst %.cc, %.o, $(sup_src))
 
-all						: ofdmtxrx.exe
+all							: ofdmtxrx.exe mimo_siso_tx.exe
 
-mimo_siso_tx1	: $(sup_obj) mimo_siso_tx1.o
+mimo_siso_tx.exe: $(sup_obj) mimo_siso_tx.o
 	$(env) $(CXX) $^ -o $@ $(LDFLAGS)
 
-ofdmtxrx.exe	: $(sup_obj) ofdmtxrx.o
+ofdmtxrx.exe		: $(sup_obj) ofdmtxrx.o
 	$(env) $(CXX) $^ -o $@ $(LDFLAGS)
 
-ofdmtxrx.o		: ofdmtxrx.cc
+mimo_siso_tx.o	: mimo_siso_tx.cc
 	$(CXX) $(CFLAGS) -c $< -o $@
 
-$(sup_obj)	: %.o :	%.cc
+ofdmtxrx.o			: ofdmtxrx.cc
 	$(CXX) $(CFLAGS) -c $< -o $@
 
-clean			:
-	$(RM) ofdmtxrx.exe ofdmtxrx.o $(sup_obj)
+$(sup_obj)			: %.o :	%.cc
+	$(CXX) $(CFLAGS) -c $< -o $@
+
+clean						:
+	$(RM) ofdmtxrx.exe ofdmtxrx.o
+	$(RM) mimo_siso_tx.exe mimo_siso_tx.o
+	$(RM) $(sup_obj)
